@@ -1,3 +1,5 @@
 <launch>
     <node pkg="fusion_system_display" exec="do_nothing"/>
+    <node pkg="fusion_system_drivers" exec="camera_driver"/>
+    <node pkg="fusion_system_perception" exec="camera_perception"/>
 </launch>
