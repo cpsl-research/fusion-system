@@ -1,8 +1,9 @@
+import jetson.inference
+import jetson.utils
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
-import cv2
 
 class CameraPerception(Node):
     def __init__(self):
@@ -15,21 +16,24 @@ class CameraPerception(Node):
         self.publisher_ = self.create_publisher(Image, 'camera_dets', 10)
         self.bridge = CvBridge()
 
+        # Initialize the DetectNet object
+        self.net = jetson.inference.detectNet("ssd-mobilenet-v2", threshold=0.5)
+
     def image_callback(self, msg):
-        # convert ros image to opencv image
-        cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+        # Convert ROS image to CUDA (use jetson.utils)
+        img = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
+        cuda_img = jetson.utils.cudaFromNumpy(img)
 
-        # add a box and texts in image to test
-        cv2.rectangle(cv_image, (50, 50), (200, 200), (0, 255, 0), 3)
-        cv2.putText(cv_image, 'CPSL_Fusion', (60, 130), cv2.FONT_HERSHEY_SIMPLEX, 
-                    1, (0, 255, 0), 2, cv2.LINE_AA)
+        # Use DetectNet to detect objects
+        detections = self.net.Detect(cuda_img, overlay="box,labels,conf")
 
-        # convert opencv image back to ros image
-        new_msg = self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
+        # Convert CUDA image back to ROS Image message
+        output_frame = jetson.utils.cudaToNumpy(cuda_img)
+        new_msg = self.bridge.cv2_to_imgmsg(output_frame, "bgr8")
 
-        # publish image msg 
+        # Publish the new message
         self.publisher_.publish(new_msg)
-        self.get_logger().info('Published processed image')
+        self.get_logger().info('Published processed image with detections')
 
 def main(args=None):
     rclpy.init(args=args)
@@ -40,3 +44,4 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
