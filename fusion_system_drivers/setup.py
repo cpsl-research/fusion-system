@@ -1,11 +1,11 @@
-from setuptools import find_packages, setup
+from setuptools import setup
 
-package_name = 'fusion_system_perception'
+package_name = 'fusion_system_drivers'
 
 setup(
     name=package_name,
     version='0.0.0',
-    packages=find_packages(exclude=['test']),
+    packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
@@ -13,12 +13,14 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='spencer',
-    maintainer_email='20426598+roshambo919@users.noreply.github.com',
+    maintainer='hlm',
+    maintainer_email='huluoming123@gmail.com',
     description='TODO: Package description',
-    license='MIT License',
+    license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
-        'console_scripts': [ 'camera_perception = fusion_system_perception.camera_perception:main' ],
+        'console_scripts': [
+            'camera_driver = fusion_system_drivers.camera_driver:main'
+        ],
     },
 )
