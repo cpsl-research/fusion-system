@@ -1,0 +1,9 @@
+perception_model:
+  name: "ssd-mobilenet-v2"
+  version: "1.0"
+  thresholds:
+    low: 0.3
+    high: 0.7
+  parameters:
+    - param1: 100
+    - param2: 200
